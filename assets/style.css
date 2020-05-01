@@ -1,0 +1,20 @@
+div,span{
+    margin: 0;
+    padding: 0;
+}
+
+
+h1{
+    margin: 8px;
+}
+
+#gameboard{
+    margin: 8px;
+}
+
+.cell{
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    border: 2px solid black;
+}
