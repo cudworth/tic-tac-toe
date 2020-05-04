@@ -18,3 +18,7 @@ h1{
     height: 42px;
     border: 2px solid black;
 }
+
+.cell:hover{
+    background-color: blanchedalmond;
+}
