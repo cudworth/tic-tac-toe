@@ -19,27 +19,68 @@ const newPlayer = function(symbol){
 
 
 const gameBoard = (function(){
-    const board = [['','',''],['','',''],['','','']];
+    const table = [[null,null,null],[null,null,null],[null,null,null]];
 
-    const addMark = function(mark, [i, j]){
-        board[i][j] = mark;
+    const setCell = function(i, j, player){
+        table[i][j] = player;
     };
+
+    const getCell = function(i, j){
+        return table[i][j];
+    }
 
     //TODO
     const checkWinCondition = function(){
-        return false; //TODO
+        let result = false;
+        //CHECK ROWS
+        for (i = 0; i < 3; i++) {
+            if (table[i][0] != null &&
+                table[i][0] == table[i][1] && 
+                table[i][0] == table[i][2]){
+                    result = true;
+                }
+        }
+
+        //CHECK COLS
+        for (j = 0; j < 3; j++) {
+            if (table[0][j] != null &&
+                table[0][j] == table[1][j] && 
+                table[0][j] == table[2][j]){
+                    result = true;
+                }
+        }
+
+        //CHECK DIAG
+        if (table[1][1] != null &&
+            table[1][1] == table[0][0] && 
+            table[1][1] == table[2][2]){
+                result = true;
+            }
+
+        if (table[1][1] != null &&
+            table[1][1] == table[0][2] && 
+            table[1][1] == table[2][0]){
+                result = true;
+            }
+
+        return result;
     }
 
-    //TODO
     const checkTieCondition = function(){
-        return false;
+        let result = true;
+        table.forEach(function(row){
+            if (row.includes(null)){
+                result = false;
+            }
+        })
+        return result;
     }
 
     return {
-        board,
-        addMark,
+        setCell,
+        getCell,
         checkWinCondition,
-        checkTieCondition,
+        checkTieCondition
     }
 })()
 
@@ -71,10 +112,13 @@ const displayController = (function(){
                 cell = document.createElement('span');
                 cell.setAttribute('id',`_${i}_${j}_${disp_id}`);
                 cell.setAttribute('class','cell');
-                cell.textContent = gameBoard.board[i][j];
+
+                const cell_val = gameBoard.getCell(i, j);
+                (cell_val)? cell.textContent = cell_val.mark : cell.textContent = '';
+                
                 cell.addEventListener('click', function(e){
                     const [i, j] = e.target.id.split('_').slice(1,3);
-                    gameController.addMark([i, j]);
+                    gameController.setCell(i, j);
                 })
                 row.append(cell);
             }
@@ -118,11 +162,11 @@ const gameController = (function(){
         }
     }
 
-    const addMark = function([i, j]){
-        if ('' != gameBoard.board[i][j]){
+    const setCell = function(i, j){
+        if (gameBoard.getCell(i, j)){
             return;
         } else {
-            gameBoard.board[i][j] = active_player.mark;
+            gameBoard.setCell(i, j, active_player);
 
             if (gameBoard.checkWinCondition()) {
                 active_player.addWin();
@@ -130,7 +174,7 @@ const gameController = (function(){
                 console.log(`player ${active_player.mark} is victorious`)
             }
 
-            if (gameBoard.checkTieCondition()) {
+            if (gameBoard.checkTieCondition() && !gameBoard.checkWinCondition()){
                 active_player.addTie();
                 inactive_player.addTie();
                 console.log(`game resulted in a tie`)
@@ -144,7 +188,7 @@ const gameController = (function(){
     return{
         newGame,
         getActivePlayer,
-        addMark
+        setCell
     }
 
 })()
