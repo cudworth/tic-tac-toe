@@ -8,11 +8,13 @@ const newPlayer = function(symbol){
 
     const getRecord = () => console.log(`player ${mark}'s record: ${record[0]} - ${record[1]} - ${record[2]}`);
 
-    return {mark,
-            addWin,
-            addLoss,
-            addTie,
-            getRecord}
+    return {
+        mark,
+        addWin,
+        addLoss,
+        addTie,
+        getRecord
+    }
 }
 
 
@@ -23,20 +25,23 @@ const gameBoard = (function(){
         board[i][j] = mark;
     };
 
+    //TODO
     const checkWinCondition = function(){
         return false; //TODO
     }
 
+    //TODO
     const checkTieCondition = function(){
-        return false; //TODO
+        return false;
     }
 
-    return {board,
-            addMark,
-            checkWinCondition,
-            checkTieCondition,
-            };
-})();
+    return {
+        board,
+        addMark,
+        checkWinCondition,
+        checkTieCondition,
+    }
+})()
 
 
 const displayController = (function(){
@@ -77,10 +82,12 @@ const displayController = (function(){
         }
     }
 
-    return{render,
-            setParent
-        }
-})();
+    return{
+        render,
+        setParent
+    }
+
+})()
 
 
 const gameController = (function(){
@@ -134,10 +141,13 @@ const gameController = (function(){
         }
     }
 
-    return{newGame,
-            getActivePlayer,
-            addMark};
-})();
+    return{
+        newGame,
+        getActivePlayer,
+        addMark
+    }
+
+})()
 
 
 gameController.newGame();
