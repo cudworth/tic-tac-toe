@@ -19,7 +19,11 @@ const newPlayer = function(symbol){
 
 
 const gameBoard = (function(){
-    const table = [[null,null,null],[null,null,null],[null,null,null]];
+    let table;
+
+    const newGame = function(){
+        table = [[null,null,null],[null,null,null],[null,null,null]];
+    }
 
     const setCell = function(i, j, player){
         table[i][j] = player;
@@ -29,7 +33,6 @@ const gameBoard = (function(){
         return table[i][j];
     }
 
-    //TODO
     const checkWinCondition = function(){
         let result = false;
         //CHECK ROWS
@@ -77,6 +80,7 @@ const gameBoard = (function(){
     }
 
     return {
+        newGame,
         setCell,
         getCell,
         checkWinCondition,
@@ -87,6 +91,7 @@ const gameBoard = (function(){
 
 const displayController = (function(){
     let parent_node;
+    let active_game = true;
 
     const disp_id = Math.floor(Math.random()*100000);
 
@@ -99,9 +104,19 @@ const displayController = (function(){
         parent_node.append(game_board);
     }
 
+    setStatus = function(status){
+        status_bar.textContent = status.toString();
+    }
+
     render = function(){
 
         game_board.innerHTML = '';
+
+        status_bar = document.createElement('div');
+        reset_button = document.createElement('button');
+        reset_button.textContent = 'RESET';
+        reset_button.addEventListener('click', () => gameController.newGame());
+        game_board.append(status_bar);
 
         for (i = 0; i < 3; i++){
             row = document.createElement('div');
@@ -117,18 +132,35 @@ const displayController = (function(){
                 (cell_val)? cell.textContent = cell_val.mark : cell.textContent = '';
                 
                 cell.addEventListener('click', function(e){
-                    const [i, j] = e.target.id.split('_').slice(1,3);
-                    gameController.setCell(i, j);
+                    if (active_game) {
+                        const [i, j] = e.target.id.split('_').slice(1,3);
+                        gameController.setCell(i, j);
+                    }
                 })
                 row.append(cell);
             }
             game_board.append(row);
         }
+        game_board.append(reset_button);
+    }
+
+    newGame = function(){
+        active_game = true;
+        render();
+    }
+
+    endGame = function(status){
+        active_game = false;
+        render();
+        setStatus(status);
     }
 
     return{
         render,
-        setParent
+        setParent,
+        setStatus,
+        newGame,
+        endGame
     }
 
 })()
@@ -138,6 +170,9 @@ const gameController = (function(){
     let p1, p2, active_player, inactive_player;
 
     const newGame = function(){
+
+        gameBoard.newGame();
+
         p1 = newPlayer('X');
         p2 = newPlayer('O');
         
@@ -145,7 +180,8 @@ const gameController = (function(){
         (p1 == active_player)? inactive_player = p2 : inactive_player = p1;
 
         displayController.setParent(document.querySelector('body'));
-        displayController.render();
+        displayController.newGame();
+        displayController.setStatus(`Player Turn: ${active_player.mark}`);
     }
 
     const getActivePlayer = function(){
@@ -171,17 +207,21 @@ const gameController = (function(){
             if (gameBoard.checkWinCondition()) {
                 active_player.addWin();
                 inactive_player.addLoss();
-                console.log(`player ${active_player.mark} is victorious`)
+                displayController.endGame(`Game End: Player ${active_player.mark} wins!`);
+                return;
             }
 
             if (gameBoard.checkTieCondition() && !gameBoard.checkWinCondition()){
                 active_player.addTie();
                 inactive_player.addTie();
-                console.log(`game resulted in a tie`)
+                displayController.endGame(`Game End: Tie`);
+                return;
             }
 
             swapActivePlayer();
             displayController.render();
+            displayController.setStatus(`Player Turn: ${active_player.mark}`);
+
         }
     }
 
