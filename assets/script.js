@@ -112,7 +112,7 @@ const displayController = (function(){
 
         game_board.innerHTML = '';
 
-        status_bar = document.createElement('div');
+        status_bar = document.createElement('h2');
         reset_button = document.createElement('button');
         reset_button.textContent = 'RESET';
         reset_button.addEventListener('click', () => gameController.newGame());
